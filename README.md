@@ -1,11 +1,11 @@
 
 # FaultScope – API Failure Prediction & Blast Radius Analyzer
 
-**FaultScope** is a microservice reliability and observability platform designed to detect abnormal API behavior, analyze service dependencies, estimate incident blast radius, and simulate service failures.
+FaultScope is a microservice reliability and observability platform designed to detect abnormal API behavior, analyze service dependencies, estimate incident blast radius, and simulate service failures.
 
 ## Project Status
 
-🚧 Work in Progress
+ Work in Progress
 
 ## Planned Features
 
