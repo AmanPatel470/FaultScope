@@ -1,0 +1,29 @@
+
+# Node.js
+node_modules/
+.env
+*.log
+dist/
+build/
+coverage/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+
+# ML models and generated data
+*.pkl
+*.joblib
+*.npy
+*.csv
+
+# Testing
+.pytest_cache/
