@@ -1,3 +1,4 @@
+
 'use strict';
 
 const { metrics } = require('@opentelemetry/api');
@@ -55,7 +56,9 @@ class DownstreamError extends Error {
     this.body = body;
     this.attempts = 1;
 
-    if (cause) this.cause = cause;
+    if (cause) {
+      this.cause = cause;
+    }
   }
 }
 
@@ -75,6 +78,24 @@ function outcomeOf(err) {
   if (err.kind === 'network') return 'network';
 
   return err.status >= 500 ? 'http_5xx' : 'http_4xx';
+}
+
+// Extract the deepest nested cause without entering a circular chain.
+function getRootCause(err) {
+  let current = err;
+  const seen = new Set();
+
+  while (
+    current &&
+    current.cause &&
+    typeof current.cause === 'object' &&
+    !seen.has(current.cause)
+  ) {
+    seen.add(current);
+    current = current.cause;
+  }
+
+  return current;
 }
 
 function recordAttempt(service, method, outcome, startedAt) {
@@ -203,7 +224,10 @@ function createHttpClient({
           attempts: attempt,
         };
       } catch (err) {
-        if (err.name !== 'DownstreamError') throw err;
+        // Only handle errors created by this HTTP client.
+        if (!(err instanceof DownstreamError)) {
+          throw err;
+        }
 
         const outcome = outcomeOf(err);
 
@@ -226,6 +250,8 @@ function createHttpClient({
           reason: outcome,
         });
 
+        const rootCause = getRootCause(err);
+
         logger.warn('downstream_retry', {
           requestId,
           service,
@@ -234,6 +260,8 @@ function createHttpClient({
           attempt,
           reason: err.kind,
           status: err.status,
+          errorCode: rootCause?.code || null,
+          errorMessage: rootCause?.message || null,
           retryInMs: delay,
         });
 

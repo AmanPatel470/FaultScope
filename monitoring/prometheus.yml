@@ -1,0 +1,34 @@
+global:
+  scrape_interval: 5s
+  scrape_timeout: 4s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: prometheus
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # One job per service, so the "job" label is the service name in every query.
+  - job_name: api-gateway
+    static_configs:
+      - targets: ['host.docker.internal:9470']
+
+  - job_name: auth-service
+    static_configs:
+      - targets: ['host.docker.internal:9471']
+
+  - job_name: order-service
+    static_configs:
+      - targets: ['host.docker.internal:9472']
+
+  - job_name: payment-service
+    static_configs:
+      - targets: ['host.docker.internal:9473']
+
+  - job_name: inventory-service
+    static_configs:
+      - targets: ['host.docker.internal:9474']
+
+  - job_name: notification-service
+    static_configs:
+      - targets: ['host.docker.internal:9475']

@@ -1,3 +1,4 @@
+
 'use strict';
 
 const { metrics } = require('@opentelemetry/api');
@@ -203,7 +204,10 @@ function createHttpClient({
           attempts: attempt,
         };
       } catch (err) {
-        if (err.name !== 'DownstreamError') throw err;
+        // Only handle errors created by this HTTP client.
+        if (!(err instanceof DownstreamError)) {
+          throw err;
+        }
 
         const outcome = outcomeOf(err);
 
@@ -226,6 +230,7 @@ function createHttpClient({
           reason: outcome,
         });
 
+        // Include the underlying network error for diagnosis.
         logger.warn('downstream_retry', {
           requestId,
           service,
@@ -234,6 +239,8 @@ function createHttpClient({
           attempt,
           reason: err.kind,
           status: err.status,
+          errorCode: err.cause?.code || null,
+          errorMessage: err.cause?.message || null,
           retryInMs: delay,
         });
 

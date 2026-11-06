@@ -1,0 +1,11 @@
+apiVersion: 1
+
+providers:
+  - name: faultscope
+    folder: FaultScope
+    type: file
+    disableDeletion: false
+    allowUiUpdates: true
+    updateIntervalSeconds: 10
+    options:
+      path: /var/lib/grafana/dashboards
