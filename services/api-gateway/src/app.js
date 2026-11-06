@@ -4,6 +4,7 @@ const express = require('express');
 const defaultConfig = require('./config');
 const { createHttpClient } = require('./httpClient');
 const requestLogger = require('./middleware/requestLogger');
+const metricsMiddleware = require('./middleware/metrics');
 const { notFoundHandler, errorHandler } = require('./middleware/errorHandler');
 const { createAuthenticate } = require('./middleware/authenticate');
 const { createHealthRouter } = require('./routes/health');
@@ -21,6 +22,7 @@ function createApp({ config = defaultConfig } = {}) {
   const authenticate = createAuthenticate({ client, config });
 
   app.disable('x-powered-by');
+  app.use(metricsMiddleware);
   app.use(requestLogger);
   app.use(express.json({ limit: '10kb' }));
 

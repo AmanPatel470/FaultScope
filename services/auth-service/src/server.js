@@ -2,20 +2,33 @@
 
 const config = require('./config');
 const logger = require('./logger');
-const { createApp } = require('./app');
+const { startTelemetry, readMetricsConfig } = require('./telemetry');
 
-const app = createApp();
+async function main() {
+  // Register the MeterProvider first; ./app (and what it requires) creates instruments on load.
+  const telemetry = await startTelemetry({ serviceName: config.serviceName, ...readMetricsConfig() });
 
-const server = app.listen(config.port, () => {
-  logger.info('service_started', { port: config.port, nodeEnv: config.nodeEnv });
-});
+  const { createApp } = require('./app');
+  const app = createApp();
 
-function shutdown(signal) {
-  logger.info('service_stopping', { signal });
-  server.close(() => process.exit(0));
-  // Force exit if connections refuse to close.
-  setTimeout(() => process.exit(1), 5000).unref();
+  const server = app.listen(config.port, () => {
+    logger.info('service_started', { port: config.port, nodeEnv: config.nodeEnv });
+  });
+
+  function shutdown(signal) {
+    logger.info('service_stopping', { signal });
+    server.close(() => {
+      telemetry.shutdown().finally(() => process.exit(0));
+    });
+    // Force exit if connections refuse to close.
+    setTimeout(() => process.exit(1), 5000).unref();
+  }
+
+  process.on('SIGINT', () => shutdown('SIGINT'));
+  process.on('SIGTERM', () => shutdown('SIGTERM'));
 }
 
-process.on('SIGINT', () => shutdown('SIGINT'));
-process.on('SIGTERM', () => shutdown('SIGTERM'));
+main().catch((err) => {
+  logger.error('startup_failed', { message: err.message });
+  process.exit(1);
+});

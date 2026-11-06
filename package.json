@@ -1,8 +1,10 @@
 {
   "name": "faultscope",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "scripts": {
-    "test:e2e": "node --test tests/e2e/phase1.e2e.test.js"
+    "test:e2e": "node --test tests/e2e/phase1.e2e.test.js",
+    "load": "node chaos-simulator/load-generator.js",
+    "dashboard:build": "node monitoring/grafana/generate-dashboard.js"
   }
 }

@@ -3,6 +3,7 @@
 const express = require('express');
 const defaultConfig = require('./config');
 const requestLogger = require('./middleware/requestLogger');
+const metricsMiddleware = require('./middleware/metrics');
 const { notFoundHandler, errorHandler } = require('./middleware/errorHandler');
 const healthRoutes = require('./routes/health');
 const { createPaymentStore } = require('./paymentStore');
@@ -12,6 +13,7 @@ function createApp({ config = defaultConfig, store = createPaymentStore() } = {}
   const app = express();
 
   app.disable('x-powered-by');
+  app.use(metricsMiddleware);
   app.use(requestLogger);
   app.use(express.json({ limit: '10kb' }));
 

@@ -6,8 +6,10 @@ const INITIAL_PRODUCTS = [
   { productId: 'p-300', name: '4K Monitor', unitPriceCents: 120000, stock: 5 },
 ];
 
-function createInventoryStore() {
-  const products = new Map(INITIAL_PRODUCTS.map((p) => [p.productId, { ...p }]));
+function createInventoryStore({ stockMultiplier = 1 } = {}) {
+  const products = new Map(
+    INITIAL_PRODUCTS.map((p) => [p.productId, { ...p, stock: p.stock * stockMultiplier }])
+  );
   const reservations = new Map(); // orderId -> reservation
 
   // Merge duplicate productIds so [{p-100 x1}, {p-100 x2}] becomes p-100 x3.
