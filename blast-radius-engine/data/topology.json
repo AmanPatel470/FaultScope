@@ -1,0 +1,72 @@
+{
+  "description": "FaultScope demo topology. An entry {service: A, depends_on: B} is the graph edge A -> B: A depends on B, so if B fails, A may be affected.",
+  "services": [
+    {
+      "name": "api-gateway",
+      "criticality": 1.0,
+      "description": "Entry point for all client traffic"
+    },
+    {
+      "name": "auth-service",
+      "criticality": 0.8,
+      "description": "Issues and verifies tokens"
+    },
+    {
+      "name": "order-service",
+      "criticality": 0.9,
+      "description": "Order workflow orchestration"
+    },
+    {
+      "name": "payment-service",
+      "criticality": 1.0,
+      "description": "Charges customers (revenue path)"
+    },
+    {
+      "name": "inventory-service",
+      "criticality": 0.7,
+      "description": "Stock reservation and pricing"
+    },
+    {
+      "name": "notification-service",
+      "criticality": 0.3,
+      "description": "Best-effort customer notifications"
+    }
+  ],
+  "dependencies": [
+    {
+      "service": "api-gateway",
+      "depends_on": "auth-service",
+      "dependency": "hard",
+      "strength": 1.0,
+      "rationale": "Every protected route verifies its token with Auth; login is proxied to Auth."
+    },
+    {
+      "service": "api-gateway",
+      "depends_on": "order-service",
+      "dependency": "hard",
+      "strength": 0.9,
+      "rationale": "Order routes are proxied; login and gateway health keep working without Order."
+    },
+    {
+      "service": "order-service",
+      "depends_on": "inventory-service",
+      "dependency": "hard",
+      "strength": 1.0,
+      "rationale": "An order cannot be priced or reserved without Inventory (Phase 1 returns 502)."
+    },
+    {
+      "service": "order-service",
+      "depends_on": "payment-service",
+      "dependency": "hard",
+      "strength": 1.0,
+      "rationale": "An order cannot be charged without Payment (Phase 1 returns 502 and releases stock)."
+    },
+    {
+      "service": "order-service",
+      "depends_on": "notification-service",
+      "dependency": "soft",
+      "strength": 0.2,
+      "rationale": "Best-effort: the order still succeeds with notification 'degraded' (Phase 1 e2e test)."
+    }
+  ]
+}
