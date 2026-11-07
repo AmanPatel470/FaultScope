@@ -83,7 +83,7 @@ def _require_service(graph: nx.DiGraph, service: str) -> None:
         raise UnknownServiceError(f"Unknown service '{service}'. Known services: {known}")
 
 
-def _hard_subgraph(graph: nx.DiGraph) -> nx.DiGraph:
+def hard_subgraph(graph: nx.DiGraph) -> nx.DiGraph:
     """Same nodes, but only the hard dependency edges."""
     hard = nx.DiGraph()
     hard.add_nodes_from(graph.nodes)
@@ -111,7 +111,7 @@ def analyze_failure(
     if max_paths < 1:
         raise ValueError("max_paths must be at least 1")
 
-    hard_graph = _hard_subgraph(graph)
+    hard_graph = hard_subgraph(graph)
     dependents = nx.ancestors(graph, failed_service)  # everything that can reach the failed service
     distances = dict(nx.single_target_shortest_path_length(graph, failed_service))
 
