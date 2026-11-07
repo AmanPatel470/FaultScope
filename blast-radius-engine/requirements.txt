@@ -1,2 +1,4 @@
-# Runtime dependencies (the web stack is added in Part 2)
+# Runtime dependencies
 networkx>=3.4,<4
+fastapi>=0.115,<1
+uvicorn>=0.30,<1
