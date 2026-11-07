@@ -1,0 +1,1 @@
+"""FaultScope anomaly engine: synthetic telemetry, Isolation Forest and a rolling-baseline control."""

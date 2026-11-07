@@ -27,3 +27,9 @@ Thumbs.db
 
 # Testing
 .pytest_cache/
+
+# Anomaly engine: generated data and trained models are reproducible, so they are not committed
+anomaly-engine/data/*
+!anomaly-engine/data/.gitkeep
+anomaly-engine/models/*
+!anomaly-engine/models/.gitkeep
