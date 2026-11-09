@@ -2,3 +2,4 @@
 
 # Testing
 pytest>=8,<10
+httpx2>=2,<3
